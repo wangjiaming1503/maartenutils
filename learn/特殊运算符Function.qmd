@@ -1,0 +1,82 @@
+---
+title: "learn-maatrenutils"
+author: "QiaoHang"
+format: html
+editor: visual
+---
+
+# 加载包
+
+```{r}
+library(maartenutils)
+```
+
+# 列出maartenutils的全部函数
+
+```{r}
+ls("package:maartenutils")
+```
+
+# Utilities and Miscellaneous Functions
+
+# \`%\|\|%\`
+
+```{r}
+# `%||%`
+`%||%` <- function(a, b) if (is.null(a) || is.na(a) || length(a) == 0) b else a
+
+
+```
+
+`%||%` Function Documentation:
+
+## Description
+
+The `%||%` function returns the first argument if it is not NULL, NA, or an empty vector; otherwise, it returns the second argument.
+
+## Usage
+
+``` r
+a %||% b
+```
+
+## Arguments
+
+-   `a`: an R object.
+-   `b`: an R object.
+
+## Details
+
+If `a` is NULL, NA, or an empty vector, the function returns `b`; otherwise, it returns `a`.
+
+## Value
+
+The result of the function is either `a` or `b`, depending on the conditions described in the "Details" section.
+
+## Examples
+
+```{r}
+x <- 1
+y <- NULL
+z <- c()
+
+x_result <- x %||% 10
+y_result <- y %||% 10
+z_result <- z %||% 10
+
+x_result
+
+# Output: [1] 1 
+
+y_result
+# Output: [1] 10
+
+z_result
+# Output: [1] 10
+```
+
+## See Also
+
+Other functions that can be used for similar purposes include `ifelse`, `coalesce` (from the `dplyr` package), and the `||` and `&&` operators.
+
+Hope this helps! Let me know if you have further questions or issues!

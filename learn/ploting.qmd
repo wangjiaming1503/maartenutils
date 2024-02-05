@@ -1,0 +1,631 @@
+---
+title: "theme_ms"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(maartenutils)
+# 首先，加载所需的库
+library(ggplot2)
+
+# 创建一个包含分组变量的数据集
+data <- data.frame(
+  x = rep(c("A", "B", "C"), each = 10),
+  y = rnorm(30),
+  group = rep(c("Group 1", "Group 2", "Group 3"), each = 10)
+)
+
+# 创建一个散点图，并按组着色
+plot <- ggplot(data, aes(x = x, y = y, color = group)) +
+  geom_point() +
+  labs(title = "Customized Theme Example", x = "X Axis", y = "Y Axis", color = "Group")
+
+# 使用 theme_ms 函数来自定义图表主题，包括图例位置和外观
+custom_theme <- theme_ms(base_size = 10, base_family = 'Arial', legend_pos = 'right', legend.direction = "vertical")
+
+# 'horizontal'"vertical" 
+# Top, right, bottom, left
+# 应用自定义主题到图表上
+final_plot <- plot + custom_theme
+
+# 显示最终的图表
+print(final_plot)
+```
+
+```{r}
+
+
+library(maartenutils)
+# 加载所需库
+library(ggplot2)
+
+# 创建一个简单的数据集
+data <- data.frame(
+  category = c("A", "B", "C", "D"),
+  value = c(20, 35, 25, 40)
+)
+
+# 创建一个基础条形图
+plot <- ggplot(data, aes(x = category, y = value)) +
+  geom_bar(stat = "identity") +
+  labs(title = "example", x = "class", y = "value")
+plot
+# 设置x轴标签的旋转角度为45度，并应用对齐调整
+rotation_angle <- 45
+custom_theme <- rotate_x_labels(rotation_angle)
+
+# 将自定义主题应用到图表上
+final_plot <- plot + custom_theme
+
+# 显示最终的图表
+print(final_plot)
+```
+
+```{r}
+# 查找图像目录，使用默认参数
+find_img_dir()
+
+# 查找包含 "img" 或 "fig" 的图像目录
+find_img_dir('img|fig')
+```
+
+```{r}
+# 导入所需的包
+library(ggplot2)
+# plots|img|fig 默认把图保存至下面的文件夹
+# 创建一个简单的数据集
+data <- data.frame(
+  x = c(1, 2, 3, 4, 5),
+  y = c(2, 3, 5, 7, 11)
+)
+
+# 使用ggplot2创建散点图
+p <- ggplot(data, aes(x, y)) + geom_point()
+
+# 保存图形为PNG格式，应用黄金比例
+w_ggsave(fn = "scatter_plot_example", plot = p, plot_ratio = 'golden_ratio', h = 10, filetypes = c('png'))
+w_ggsave("myplot-3",p)
+
+```
+
+这些R语言函数主要用于处理`ggplot2`图形对象。我将逐个解释这些函数的作用，并告诉你如何使用它们。
+
+### `to_g` 函数
+
+`to_g` 函数的目的是将`ggplot`对象转换为`gtable`对象，以便于后续操作或者绘图元素的调整。
+
+使用方式如下：
+
+```{R}
+library(ggplot2)
+
+# 创建一个 ggplot 对象
+p <- ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
+
+# 使用 to_g 函数将其转换为 gtable 对象
+g <- to_g(p)
+```
+
+### `normalize_grob_widths` 函数
+
+`normalize_grob_widths` 函数的目的是对一组图形对象的宽度进行标准化，确保它们拥有相同的宽度，这在排列多个图表时非常有用。
+
+使用方式如下：
+
+```{r}
+# 假设您有两个 ggplot 对象 p1 和 p2
+p1 <- ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
+p2 <- ggplot(mtcars, aes(x=hp, y=mpg)) + geom_point()
+
+# 使用 normalize_grob_widths 函数对它们的宽度进行标准化
+gtables <- normalize_grob_widths(list(p1, p2))
+
+# 打开一个图形设备
+png('combined_plot.png', width=1600, height=600)
+
+# 使用 grid.arrange 组合并绘制两个 gtable 对象
+grid.arrange(grobs = gtables_width_normalized, ncol = 2)
+
+# 关闭图形设备
+dev.off()
+
+
+```
+
+### `normalize_grob_heights` 函数
+
+`normalize_grob_heights` 函数的目的是对一组图形对象的高度进行标准化，以确保它们在垂直方向上的大小一致。
+
+使用方式如下：
+
+```{r}
+# 继续使用上面的 p1 和 p2
+# 使用 normalize_grob_heights 函数对它们的高度进行标准化
+gtables_height_normalized <- normalize_grob_heights(list(p1, p2))
+```
+
+### 注意事项
+
+-   在使用这些函数之前，请确保你已经安装并加载了`ggplot2`和`grid`包。
+-   当处理多个图形对象时，通常是将它们放在一个列表中，然后将该列表传递给`normalize_grob_widths`和`normalize_grob_heights`函数。
+-   这些函数可以使得组合多个图表时它们在视觉上保持一致，特别是在宽度和高度上。
+
+使用这些函数可以帮助你在制作多图布局（如面板图）时，确保各个图形元素在尺寸上的一致性，从而制作出外观更为专业的图表。
+
+```{r}
+library(gridExtra)
+
+# 假设 g1 和 g2 是两个 gtable 对象
+g1 <- to_g(ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point())
+g2 <- to_g(ggplot(mtcars, aes(x=hp, y=mpg)) + geom_point())
+
+# 标准化宽度和高度
+gtables_width_normalized <- normalize_grob_widths(list(g1, g2))
+gtables_height_normalized <- normalize_grob_heights(list(g1, g2))
+
+# 打开一个图形设备
+png('combined_plot.png', width=1600, height=600)
+
+# 使用 grid.arrange 组合并绘制两个 gtable 对象
+grid.arrange(grobs = gtables_width_normalized, ncol = 2)
+
+# 关闭图形设备
+dev.off()
+
+```
+
+```{r}
+library(ggplot2)
+library(grid)
+library(maartenutils)
+# 创建一个简单的 ggplot 对象
+p <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point() +theme_ms()
+p
+# 调用 set_panel_size 函数，将面板大小固定为 5cm x 5cm
+p1 <-set_panel_size(p, width = unit(5, "cm"), height = unit(5, "cm"))
+p1
+grid.draw(p1)
+
+dev.off()
+# 很方便调整画图的大小
+```
+
+```{r}
+library(ggplot2)
+library(cowplot)
+library(maartenutils)
+library(glue)
+# 设定全局字体大小
+global_label_size <- 12 
+
+# 创建两个简单的 ggplot 对象
+p1 <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+p2 <- ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()
+
+# 调用 plot_panel 函数，将两个图形排列在一个面板中,调整大小同时加上字母，字母大小为全局字体大小，save_bool = F（废弃）
+p3 <-plot_panel(plots = list(p1, p2), ncol = 2)
+p3
+print(append_date_to_fn("arrangeplot.pdf"))
+w_ggsave(append_date_to_fn("arrangeplot"),p3)
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(cowplot)
+library(maartenutils)
+# Create some sample plots
+plot1 <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+plot2 <- ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()
+plot3 <- ggplot(mtcars, aes(x = qsec, y = mpg)) + geom_point()
+plot4 <- ggplot(mtcars, aes(x = disp, y = mpg)) + geom_point()
+
+# List of plots
+plots <- list(plot1, plot2, plot3, plot4)
+
+# Call the main function to create the layout and generate the PDF
+p4 <-plot_panel(plots = plots, ncol = 2)
+p4
+plot_panel_layout(plots, filename = append_date_to_fn("my_plots.pdf"))
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(patchwork)
+library(maartenutils)
+
+# Create some sample plots
+plot1 <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+plot2 <- ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()
+plot3 <- ggplot(mtcars, aes(x = qsec, y = mpg)) + geom_point()
+plot4 <- ggplot(mtcars, aes(x = disp, y = mpg)) + geom_point()
+plot5 <- ggplot(mtcars, aes(x = drat, y = mpg)) + geom_point()
+plot6 <- ggplot(mtcars, aes(x = wt, y = hp)) + geom_point()
+plot7 <- ggplot(mtcars, aes(x = qsec, y = wt)) + geom_point()
+plot8 <- ggplot(mtcars, aes(x = disp, y = hp)) + geom_point()
+
+# List of plots
+plots <- list(plot1, plot2, plot3, plot4, plot5, plot6, plot7, plot8)
+
+# Call the multi_page_patchwork function to create the multi-page PDF
+multi_page_patchwork(plots, filename = "multi_page_plots.pdf", nrow = 2, ncol = 2)
+```
+
+```{r}
+# 使用 darken 函数
+darken("lightblue")  # 将 "lightblue" 颜色变暗
+c("#7B9AA4")
+
+darken(c("lightblue", "lightgreen"), 1.6)  # 将 "lightblue" 和 "lightgreen" 颜色向量分别变暗
+c("#6C878F","#5A945A" )
+
+darken(c("lightblue", "lightgreen"), c(1.6, 1.3))  # 将 "lightblue" 和 "lightgreen" 颜色向量分别按照不同的因子变暗
+c("#6C878F","#6EB76E" )
+
+# 使用 lighten 函数
+lighten("darkred")  # 将 "darkred" 颜色变亮
+c("#C20000" )
+
+lighten(c("darkred", "darkgreen"), 1.6)  # 将 "darkred" 和 "darkgreen" 颜色向量分别变亮
+c("#DE0000","#00A000" )
+
+lighten(c("darkred", "darkgreen"), c(1.6, 1.3))  # 将 "darkred" 和 "darkgreen" 颜色向量分别按照不同的因子变亮
+c("#DE0000","#008200")
+```
+
+The provided code appears to be a collection of functions related to color manipulation, conversion, and generation. Let's go through each function and provide an explanation.
+
+rgb_to_hsl This function converts RGB color coordinates to HSL (Hue, Saturation, Lightness) coordinates. It takes three arguments representing the red, green, and blue channels and returns a vector containing the HSL values.
+
+hsl_to_hex This function takes HSL coordinates and converts them to a hexadecimal color code. It internally uses hsl_to_rgb and rgb_to_hex functions to perform this conversion.
+
+rgb_to_hex Given RGB coordinates, this function converts them to a hexadecimal color code. It takes red, green, and blue values as input and an optional normalization factor and returns the corresponding hexadecimal color code.
+
+hex_to_rgb This function takes a hexadecimal color code as input and returns the corresponding RGB coordinates as a vector.
+
+hexalpha and col_to_hex These functions are copied from the palr package. hexalpha is used to convert alpha values to hexadecimal form, and col_to_hex is used to convert a color to hexadecimal form with an optional alpha channel.
+
+gen_color_vector This function generates a vector of colors from a color palette. It allows for interpolation between discrete colors to generate more colors and also supports using a single color and mapping it to multiple colors.
+
+gen_col_gradient_vector This function generates a gradient vector of colors between a specified primary color and an offset color. It uses the circlize package's colorRamp2 function to interpolate colors between the given primary and offset colors.
+
+```{r}
+# Convert RGB to HSL
+hsl_values <- rgb_to_hsl(255, 0, 0)
+print(hsl_values)
+
+# Convert HSL to Hex
+hex_code <- hsl_to_hex(0, 1, 0.5)
+print(hex_code)
+
+# Convert RGB to Hex
+hex_rgb <- rgb_to_hex(255, 0, 0)
+print(hex_rgb)
+
+# Convert Hex to RGB
+rgb_values <- hex_to_rgb("#FF0000")
+print(rgb_values)
+   
+
+
+# Generate a color vector
+color_vector <- gen_color_vector(n = 5, name = "Spectral")
+print(color_vector)
+  # class1      class2      class3      class4 
+c("#D7191CFF","#FDC980FF","#C7E8ADFF","#2B83BAFF" )
+
+
+# Generate a color gradient vector
+gradient_vector <- gen_col_gradient_vector("blue", 10, offset_col = "grey90")
+print(gradient_vector)
+ c("#D1C0ECFF","#C6ADEFFF","#BA9BF1FF","#AD89F4FF","#9F76F6FF","#8F64F8FF","#7C51FAFF","#663DFCFF","#4826FDFF","#0000FFFF")
+gradient_vector <- gen_col_gradient_vector("blue", 10, offset_col = "red")
+print(gradient_vector)
+"#EF003FFF" "#E60055FF" "#DB006AFF" "#D0007EFF" "#C30093FF" "#B300A8FF" "#A000BDFF" "#8700D3FF" "#6400E9FF" "#0000FFFF"
+plot.color_vector(gradient_vector)
+```
+
+```{r}
+```
+
+在您提供的代码中，`hexalpha` 和 `col_to_hex` 函数是从 `palr` 包中复制的。这两个函数的主要目的是与透明度相关的颜色转换。
+
+#### 使用 `hexalpha` 函数
+
+`hexalpha` 函数将透明度值转换为十六进制形式。它接受一个透明度值并返回一个十六进制值。
+
+```{r}
+# 使用hexalpha函数将透明度值0.5转换为十六进制
+hex_code <- hexalpha(0.5)
+print(hex_code)  # 输出对应的十六进制值
+```
+
+#### 使用 `col_to_hex` 函数
+
+`col_to_hex` 函数将颜色转换为具有可选透明度的十六进制形式。它接受一个颜色值和一个可选的透明度值，并返回一个带有透明度的十六进制颜色代码。
+
+```{r}
+# 将颜色值"red"转换为十六进制，并设置透明度为0.5
+hex_color_with_alpha <- col_to_hex("red", alpha = 0.5)
+print(hex_color_with_alpha)  # 输出带有透明度的十六进制颜色代码
+c( "#FF000080")
+
+```
+
+#### `gen_color_vector` 函数的更多示例
+
+`gen_color_vector` 函数用于生成一组颜色的向量。下面是一个更多的示例，展示了如何使用该函数以及如何使用不同的参数来获得不同的结果。
+
+```{r}
+# 生成一个包含5种颜色的向量，使用"Viridis"调色板
+#   'arg' should be one of “Set1”, “Dark1”, “Dark2”, “Spectral”, “Greys”, “GrandBudapest”, “GrandBudapest1”, “GrandBudapest2”, “Moonrise1”, “Moonrise2”, “Moonrise3”, “BottleRocket”, “BottleRocket1”, “Chevalier”, “Chevalier1”, “FantasticFox”, “FantasticFox1”, “Zissou”, “Zissou1”, “Cavalcanti”, “Cavalcanti1”, “Royal1”, “Darjeeling1”, “Darjeeling”
+color_vector_viridis <- gen_color_vector(n = 3, name = "Set1")
+print(color_vector_viridis)
+
+# 生成一个包含10种颜色的向量，使用"Blues"调色板，并且不包括白色 这部分的颜色数量可能有问题。
+color_vector_blues <- gen_color_vector(n = 10)
+print(color_vector_blues)
+   class1      class2      class3      class4 
+"#446455FF" "#FDD262FF" "#D3DDDCFF" "#C7B19CFF" 
+"#D53E4FFF" "#FDC47AFF" "#CCEA96FF" "#3288BDFF" 
+
+```
+
+#### `gen_col_gradient_vector` 函数的用途
+
+`gen_col_gradient_vector` 函数用于生成两种颜色之间的渐变颜色向量。这对于在数据可视化中显示渐变效果非常有用。
+
+```{r}
+# 生成从"blue"到"grey90"的渐变颜色向量，共有10种颜色
+gradient_vector <- gen_col_gradient_vector("blue", 20, offset_col = "red")
+print(gradient_vector)
+
+plot.color_vector(gradient_vector)
+
+darken("red")
+"#B60000" 
+gradient_vector <- gen_col_gradient_vector("navyblue", 10, offset_col = "#B60000" )
+gradient_vector
+plot.color_vector(gradient_vector)
+
+```
+
+通过使用这些函数，您可以轻松地进行颜色转换、生成颜色向量和创建渐变颜色，以便在数据可视化中使用。
+
+The given R code consists of three functions that are useful for generating and adjusting color palettes and customizing breaks in ggplot2 scales. Below is an explanation of each function:
+
+### 1. `gen_color_palette` Function
+
+This function generates a color ramp based on a specified palette. It includes an option to choose from a set of pre-defined palettes, including both RColorBrewer palettes and Wes Anderson film-inspired palettes (from the `wesanderson` package).
+
+**Arguments:** - `name`: A string specifying the name of the palette to use. - `n`: The number of colors to generate in the palette. - `prims`: The number of primary colors to use from the palette.
+
+**Process:** - A vector `palette_prims` is defined, mapping palette names to the number of primary colors they contain. - The `name` argument is matched against available palette names, and the corresponding number of primary colors is retrieved. - The `prims` argument is checked to ensure it is not asking for more primary colors than the palette can provide. - Depending on whether the palette is from RColorBrewer or Wes Anderson, the appropriate function is called to generate the palette (`brewer.pal` or `wes_palette`). - A color ramp is created using `colorRampPalette`.
+
+**Example Usage:**
+
+```{r}
+# Step 1: Generate a color ramp function using gen_color_palette
+my_color_ramp <- gen_color_palette("Set1", n = 30)
+
+# Step 2: Now my_color_ramp is a function that can be used to generate color palettes.
+# Let's say you want to generate 10 colors from this ramp.
+
+# Step 3: Use the function to generate colors
+colors <- my_color_ramp(10)
+
+# The variable `colors` now contains 10 colors from the "Set1" palette.
+colors
+plot.color_vector(colors)
+
+library(ggplot2)
+
+# Some example data
+df <- data.frame(x = 1:10, y = rnorm(10))
+
+# Create a ggplot using the colors from the color ramp
+ggplot(df, aes(x = x, y = y, color = factor(x))) +
+  geom_point(size = 4) +
+  scale_color_manual(values = colors)
+```
+
+### 2. `adjust_colors` Function
+
+This function adjusts the saturation and brightness of a given set of colors.
+
+**Arguments:** - `cols`: A vector of colors to adjust. - `sat`: Saturation multiplier, where 1 is unchanged. - `brightness`: Brightness multiplier, where 1 is unchanged.
+
+**Process:** - The `rgb2hsv` function is used to convert the colors from RGB to HSV (Hue, Saturation, Value) space. - The saturation and brightness are then adjusted by multiplying with the provided `sat` and `brightness` values. - The `hsv` function is used to convert the adjusted HSV values back to RGB color values.
+
+**Example Usage:**
+
+```{r}
+adjusted_colors <- adjust_colors(c("#FF0000", "#00FF00"), sat = 0.5, brightness = 1.2)
+plot.color_vector(adjusted_colors)
+```
+
+这段代码是一个函数，名为internal_breaks，它旨在修改ggplot2中的坐标刻度标签以便在紧密排列的面板（facets）中避免标签重叠的问题。下面是对这段代码的解释和示例：
+
+函数解释 internal_breaks函数接受三个参数：
+
+n: 表示要生成的刻度数量，默认为5。 left_i: 表示要保留的左侧刻度数，默认为1。 right_i: 表示要保留的右侧刻度数，默认为1。 ...: 其他参数，将被传递给scales::extended_breaks函数。 函数内部返回了一个函数，这是一个闭包，它接受一个参数x，这个参数通常是要修改刻度的向量。
+
+在函数内部，它首先使用scales::extended_breaks生成一组刻度标签scale_labels，然后从中选择要保留的刻度。
+
+最后，它返回了经过选择的刻度标签。
+
+示例代码 下面是一个简单的示例代码，演示了如何使用internal_breaks函数来修改ggplot2的坐标刻度标签：
+
+**Example Usage:**
+
+```{r}
+library(ggplot2)
+
+# 创建一个示例数据集
+data <- data.frame(
+  x = rep(1:5, 2),
+  y = c(3, 1, 4, 1, 5, 9, 2, 6, 5, 3)
+)
+
+# 创建一个ggplot对象，并使用facet_wrap创建面板
+p <- ggplot(data, aes(x = x, y = y)) +
+  geom_point() +
+  facet_wrap(~ x, scales = "free")
+p
+# 修改y轴的刻度标签
+p + scale_y_continuous(breaks = internal_breaks()(data$y))
+
+```
+
+函数internal_breaks的目的是通过限制显示的刻度标签数量来解决这个问题。这样，当在紧密排列的面板中有大量标签需要显示时，函数可以确保仅显示部分标签，并防止它们重叠或覆盖。这样可以保持图表的清晰度和可读性，使得每个面板上的标签都能够清晰可见，而不会由于拥挤而难以辨认。
+
+```{r}
+library(ggplot2)
+
+# 创建一个示例数据集
+data <- data.frame(
+  x = 1:10,
+  y = rnorm(10)
+)
+
+# 创建一个散点图
+p <- ggplot(data, aes(x = x, y = y)) +
+  geom_point()
+
+# 提取 x 轴范围
+x_range <- get_ggplot_range(p, axis = 'x')
+print(x_range)
+
+# 提取 y 轴范围
+y_range <- get_ggplot_range(p, axis = 'y')
+print(y_range)
+```
+
+提供的代码似乎是一组用于 ggplot2 的函数和主题配置。以下是每个函数和主题配置的作用：
+
+### 函数:
+
+1.  `interpolate_in_range`：该函数似乎根据指定的度在给定范围内执行线性插值。
+
+2.  `interpolate_in_gg_range`：此函数似乎使用 `get_ggplot_range` 来在指定的 ggplot 轴范围内进行插值（默认为 x 轴）。
+
+3.  `var_to_label`：此函数似乎是一个实用程序，用于将变量名称转换为更易读的标签，方法是用空格替换下划线，并大写每个单词的第一个字母。
+
+### 主题配置:
+
+代码还包括几个用于 ggplot2 可视化的主题配置： 1. `remove_x`：隐藏 x 轴标题、刻度线和标签。 2. `remove_y`：隐藏 y 轴标题、刻度线和标签。 3. `remove_strip`：隐藏条带文本和背景，并调整绘图边距。 4. `remove_legend`：从图中移除图例。 5. `gg_legend_alpha_cancel`：覆盖图例中填充和颜色的 alpha 值为 1，从而关闭透明度。 6. `gg_remove_x_labels`：隐藏 x 轴刻度线和标签。 7. `transparent_legend`：将图例背景和键设置为透明。 8. `transparent_plot`：将绘图背景设置为透明。
+
+### 示例用法:
+
+以下是如何在 ggplot 中使用其中一个函数和主题配置的示例：
+
+```{r}
+library(ggplot2)
+
+# 创建一个基本的 ggplot
+plot <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point()
+plot
+# 应用主题配置
+plot + remove_x + remove_y + remove_legend
+plot +gg_remove_x_labels
+
+```
+
+这将创建一个散点图，使用 `mtcars` 数据，同时去除了 x 轴、y 轴和图例。
+
+请注意，这是根据提供的代码进行的高层解释。这些函数和主题配置的使用情境可能会根据特定的数据可视化任务的具体要求而有所不同。
+
+```{r}
+# 创建示例数据集
+patient_labels_tmp <- data.frame(
+  patient_id = c(1, 2, 3, 4, 5),
+  adaptive_t_cells = c(20, 30, 25, 35, 40),
+  rna_t_cell = c(15, 25, 20, 30, 35)
+)
+
+# 调用 plot_scatter_cor 函数，传入示例数据集和一些参数
+plot_scatter_cor(
+  x_var = 'adaptive_t_cells',
+  y_var = 'rna_t_cell',
+  dtf = patient_labels_tmp,
+  cor_position = 'topleft'
+)
+
+
+# 导入所需的库
+library(data.table)
+library(ggplot2)
+library(ggpubr)
+
+
+```
+
+```{r}
+# Load required libraries
+library(data.table)
+library(ggplot2)
+library(ggpubr)
+library(purrr)
+
+# Assume `plot_scatter_cor` and `plot_panel_layout` functions are already defined
+# You would need to define or load these functions for the code to run properly.
+
+# Sample data frame (replace this with your actual data frame)
+rna_sample_annotation <- data.frame(
+  gene_expression = rnorm(100),
+  treatment_group = factor(sample(c("Treatment", "Control"), 100, replace = TRUE)),
+  time_point = sample(1:5, 100, replace = TRUE),
+  patient_ID = factor(sample(1:20, 100, replace = TRUE))
+)
+
+# Define a simple identity function for y_var_trans and var_labeller
+# In a real scenario, you might want to transform or label your variables in a specific way
+identity <- function(x) x
+
+# Call the plot_pairwise_relationships function
+# Here, we want to examine relationships with the 'gene_expression' variable.
+plot_pairwise_relationships(
+  dtf = rna_sample_annotation,
+  y_var = 'gene_expression',
+  y_var_trans = identity, # transformation function for y_var, here it is just identity
+  var_labeller = identity, # function to label variables, here it is just identity
+  blacklist_vars = c('patient_ID'), # Variables to exclude from the analysis
+  filename = 'gene_expression_correlates.pdf', # Output filename
+  nrow = 3, # Number of rows in the plot grid
+  ncol = 2  # Number of columns in the plot grid
+)
+```
+
+这段代码定义了一个函数 print_plot_eval，该函数用于绘制并评估一个给定的绘图操作。以下是对函数输入参数和功能的解释：
+
+函数参数： call: 一个表达式，用于指定要绘制的图形的绘图命令。 filename: 图形的输出文件名。 height: 图形的高度（默认为 10）。 width: 图形的宽度（默认为 12）。 units: 输出图形的单位，可以是 'cm', 'in', 'mm', 或 'px' 之一。 limitsize: 一个逻辑值，指示是否限制图形的尺寸。 device: 绘图设备类型。 bg: 图形的背景颜色。 scale: 图形的缩放比例。 dpi: 输出图形的分辨率（默认为 300）。 force_file: 一个逻辑值，指示是否强制将图形保存到文件。
+
+print_plot_eval \<- function(call, filename, height = 10, width = 12, units = c('cm', 'in', 'mm', 'px'), limitsize = TRUE, device = NULL, bg = 'white', scale = 1, dpi = 300, force_file = getOption('plot_force_file', default = F), ...)
+
+```{r}
+# 载入所需的包
+library(ggplot2)
+library(rlang)
+
+# 创建一个简单的数据集
+data <- data.frame(
+  x = 1:5,
+  y = c(2, 3, 1, 4, 5)
+)
+
+# 创建一个散点图
+scatter_plot <- ggplot(data, aes(x, y)) + 
+  geom_point()
+
+# 调用函数进行绘图并保存
+print_plot_eval( print(scatter_plot), "scatter_plot.png")
+reset_plotting_device()
+
+
+
+```

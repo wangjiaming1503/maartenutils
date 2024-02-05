@@ -1,0 +1,98 @@
+---
+title: "%nand%"
+author: "QiaoHang"
+format: html
+editor: visual
+---
+
+## 
+
+```{r}
+library(maartenutils)
+```
+
+```{r}
+#' "Not-in" operator
+#'
+#'
+'%nin%' <- function(x,y) !('%in%'(x, y))
+
+
+```
+
+'%nin%' \<- function(x, y) { \# Returns TRUE if the elements of x are not in y, otherwise FALSE !('%in%'(x, y)) }
+
+\#' %nin% operator \#' \#' The %nin% operator returns TRUE for elements in x that are not in y. \#' \#' @param x vector \#' @param y vector \#' @return A logical vector indicating whether each element of x is not in y. \#' @examples \#' a \<- c(1, 2, 3, 4) \#' b \<- c(3, 4, 5, 6) \#' a %nin% b \#' \# Output: \[1\] TRUE TRUE FALSE FALSE \#' @export
+
+```{r}
+a <- c(1, 2, 3, 4)
+b <- c(3, 4, 5, 6)
+a %nin% b
+```
+
+当使用 `%in%` 时，它会返回一个逻辑向量，指示左侧向量中的每个元素是否出现在右侧向量中。
+
+```{r}
+x <- 1:5
+y <- c(3, 4, 5)
+x %in% y
+# Output: [1] FALSE FALSE  TRUE  TRUE  TRUE
+```
+
+而当使用 `%nin%` 时，它会返回一个逻辑向量，指示左侧向量中的每个元素是否**不**出现在右侧向量中。
+
+```{r}
+a <- c(1, 2, 3, 4, 5)
+b <- c(3, 4, 5)
+a %nin% b
+# Output: [1]  TRUE  TRUE FALSE  TRUE FALSE
+```
+
+这两个运算符可以方便地用于检查元素的成员资格，例如在筛选数据时，或者在条件语句中使用。使用这两个运算符可以更方便地进行逻辑判断，简化代码并提高代码的可读性。 以下是一个使用 `%in%` 和 `%nin%` 运算符来筛选数据的示例：
+
+假设我们有一个数据框 `df`，其中包含了学生的姓名和年龄。我们想要从中筛选出年龄在 20 到 25 岁之间的学生。
+
+```{r}
+# 创建示例数据
+df <- data.frame(
+  Name = c("Alice", "Bob", "Charlie", "David", "Eve"),
+  Age = c(22, 25, 19, 21, 24)
+)
+
+# 使用 %in% 筛选年龄在 20 到 25 岁之间的学生
+age_filter <- df$Age %in% 20:25
+df_filtered <- df[age_filter, ]
+
+# 打印筛选结果
+print(df_filtered)
+```
+
+输出结果应为：
+
+```         
+     Name Age
+1   Alice  22
+2     Bob  25
+5     Eve  24
+```
+
+现在，相反地，假设我们想要筛选出年龄不在 20 到 25 岁之间的学生：
+
+```{r}
+# 使用 %nin% 筛选年龄不在 20 到 25 岁之间的学生
+age_filter <- df$Age %nin% 20:25
+df_filtered <- df[age_filter, ]
+
+# 打印筛选结果
+print(df_filtered)
+```
+
+输出结果应为：
+
+```         
+     Name Age
+3 Charlie  19
+4   David  21
+```
+
+以上演示了如何使用 `%in%` 和 `%nin%` 运算符来筛选数据。

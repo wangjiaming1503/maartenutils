@@ -1,0 +1,58 @@
+---
+title: ""NAND'"
+format: html
+editor: visual
+---
+
+```{r}
+#' "NAND' operator
+#'
+#' The %nand% operator performs a logical NAND operation on two logical vectors or values.
+#'
+#' @param x A logical vector or value.
+#' @param y A logical vector or value.
+#' @return The result of the logical NAND operation between x and y.
+#' @examples
+#' a <- c(TRUE, TRUE, FALSE, FALSE)
+#' b <- c(TRUE, FALSE, TRUE, FALSE)
+#' a %nand% b
+#' # Output: [1] FALSE  TRUE  TRUE  TRUE
+#'
+#' nand(TRUE, FALSE)
+#' # Output: [1] TRUE
+#' @export
+'%nand%' <- function(x, y) !(x & y)
+
+#' Perform a logical NAND operation on two values.
+#'
+#' @param x A logical value.
+#' @param y A logical value.
+#' @return The result of the logical NAND operation between x and y.
+#' @examples
+#' nand(TRUE, FALSE)
+#' # Output: [1] TRUE
+#' @export
+nand <- function(x, y) !(x & y)
+
+# Example usage
+a <- c(TRUE, TRUE, FALSE, FALSE)
+b <- c(TRUE, FALSE, TRUE, FALSE)
+a %nand% b
+# Output: [1] FALSE  TRUE  TRUE  TRUE
+
+nand(TRUE, FALSE)
+# Output: [1] TRUE
+```
+
+当比较 NAND 和 AND 时，可以看到它们是互补的逻辑操作。AND 运算符只有在所有输入都为 true 时才返回 true，而 NAND 运算符在所有输入都为 true 时返回 false。
+
+下面是它们的真值表对比：
+
+| A     | B     | A AND B | A NAND B |
+|:------|:------|:--------|:---------|
+| false | false | false   | true     |
+| false | true  | false   | true     |
+| true  | false | false   | true     |
+| true  | true  | true    | false    |
+
+在计算机科学和逻辑电路设计中，AND 和 NAND 操作符用于构建逻辑功能和逻辑电路。它们在控制流、布尔代数和逻辑计算中起着重要作用。

@@ -545,7 +545,7 @@ cond_rm <- function(..., env = globalenv(), verbose = F) {
 
 
 check_columns <- function(dtf, query_colnames) {
-  stopifnot(all(c('data.frame', 'data.table') %in% class(dtf)))
+  stopifnot(any(c('data.frame', 'data.table') %in% class(dtf)))
   missing_colnames <- setdiff(query_colnames, colnames(dtf))
   if (length(missing_colnames) > 0) {
     mymessage('check_colnames',
